@@ -254,12 +254,33 @@ window.onerror = function(msg, url, line, col, err) {
     showError(msg + '\nLine: ' + line + ':' + col + '\n\n' + (err && err.stack ? err.stack : ''));
 };
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
 <script>
-if (typeof THREE === 'undefined') {
-    showError('Three.js failed to load from CDN.\nCheck your internet connection or try a different browser.');
-    throw new Error('THREE not loaded');
+// Dynamically load Three.js (bypasses htmlpreview.github.io script blocking)
+(function(){
+    var cdns = [
+        'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+        'https://unpkg.com/three@0.128.0/build/three.min.js',
+        'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'
+    ];
+    var i = 0;
+    function tryNext() {
+        if (i >= cdns.length) { showError('Three.js failed to load from all CDNs.'); return; }
+        var s = document.createElement('script');
+        s.src = cdns[i];
+        s.onload = function() {
+            if (typeof THREE !== 'undefined') { boot(); }
+            else { i++; tryNext(); }
+        };
+        s.onerror = function() { i++; tryNext(); };
+        document.head.appendChild(s);
+    }
+    tryNext();
+})();
+</script>
+<script>
+function boot() {
+    try { init(); startGame(); }
+    catch(e) { showError('Startup crash:\n' + e.message + '\n\n' + e.stack); }
 }
 // ============================================================
 //  FJORD SIMULATOR - F-22 Raptor through Norwegian Fjords
@@ -1078,13 +1099,7 @@ function onResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-// ---- BOOT ----
-try {
-    init();
-    startGame();
-} catch(e) {
-    showError('Game crashed during startup:\n\n' + e.message + '\n\n' + e.stack);
-}
+// boot() is called by the dynamic Three.js loader above
 </script>
 </body>
 </html>
