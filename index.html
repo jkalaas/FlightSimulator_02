@@ -481,19 +481,24 @@ function createWater() {
 }
 
 // ---- TERRAIN ----
+// fjordHeight(x, z) where z = distance traveled (positive, increases as you fly forward)
+// World z is negative direction of flight. Convention: z_param = -worldZ
+function fjordMeander(z) {
+    return Math.sin(z * 0.0005) * 120
+         + Math.sin(z * 0.0002) * 180
+         + Math.cos(z * 0.0008) * 80;
+}
+
 function fjordHeight(x, z) {
-    // Meandering fjord path
-    const meander = Math.sin(z * 0.0008) * 160
-                   + Math.sin(z * 0.0003) * 260
-                   + Math.cos(z * 0.0012) * 100;
+    const meander = fjordMeander(z);
     const localX = x - meander;
     const absX = Math.abs(localX);
 
-    // Fjord starts very wide and narrows as you fly further (z increases)
-    const progress = Math.min(z / 8000, 1); // 0 at start, 1 at z=8000
-    const currentWidth = 2400 - progress * 1600; // 2400 wide -> 800 narrow
+    // Fjord starts very wide and narrows gradually
+    const progress = Math.max(0, Math.min(z / 10000, 1));
+    const currentWidth = 3000 - progress * 1800; // 3000 -> 1200
     const fjordHalf = currentWidth / 2;
-    const wallStart = fjordHalf * 0.35;
+    const wallStart = fjordHalf * 0.4;
 
     // Flat water area in fjord center
     if (absX < wallStart) return -5;
@@ -521,7 +526,7 @@ function fjordHeight(x, z) {
 
 function createTerrainChunk(zStart) {
     const segs = 50;
-    const width = 2800;
+    const width = 4000;
     const geo = new THREE.PlaneGeometry(width, CHUNK_SIZE, segs, segs);
     geo.rotateX(-Math.PI / 2);
 
@@ -530,7 +535,8 @@ function createTerrainChunk(zStart) {
 
     for (let i = 0; i < pos.count; i++) {
         const vx = pos.getX(i);
-        const vz = pos.getZ(i) + zStart;
+        // FIX: vertex world z = localZ - zStart, so fjordHeight z = -worldZ = zStart - localZ
+        const vz = zStart - pos.getZ(i);
         const vy = fjordHeight(vx, vz);
         pos.setY(i, vy);
 
@@ -560,7 +566,7 @@ function createTerrainChunk(zStart) {
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geo.computeVertexNormals();
 
-    const mat = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.FrontSide });
+    const mat = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.z = -zStart;
     mesh.receiveShadow = true;
@@ -750,11 +756,15 @@ function generateRings() {
 
     const spacing = 350;
     for (let i = 0; i < NUM_RINGS; i++) {
-        const z = -(250 + i * spacing);
-        const meander = Math.sin(z*0.0008)*160 + Math.sin(z*0.0003)*260 + Math.cos(z*0.0012)*100;
-        const x = meander + (Math.random()-0.5) * 80;
-        const y = 50 + Math.random() * 120;
-        rings.push(createRing(new THREE.Vector3(x, y, z)));
+        // fz = positive distance (fjordHeight convention)
+        const fz = 200 + i * spacing;
+        // Use the SAME meander function as the terrain
+        const meander = fjordMeander(fz);
+        // Place ring right in the center of the safe corridor, small random offset
+        const x = meander + (Math.random()-0.5) * 40;
+        const y = 80 + Math.random() * 100;
+        // World z is negative
+        rings.push(createRing(new THREE.Vector3(x, y, -fz)));
     }
 }
 
@@ -781,9 +791,9 @@ function startGame() {
 
     // F-22: model nose points -Z, tail points +Z. No rotation needed.
     f22Group = createF22();
-    // Start above the fjord center
-    const startMeander = Math.sin(0)*160 + Math.sin(0)*260 + Math.cos(0)*100; // =100 at z=0
-    f22Group.position.set(startMeander, 250, 0);
+    // Start above the fjord center, matching the meander function
+    const startMeander = fjordMeander(0);
+    f22Group.position.set(startMeander, 200, 0);
     // No rotation: nose faces -Z which is forward
     scene.add(f22Group);
 
@@ -986,10 +996,13 @@ function updateMinimap() {
     ctx.lineWidth = 1;
     for (let dz = -6000; dz < 6000; dz += 200) {
         const wz = pz + dz;
-        const meander = Math.sin((-wz)*0.0008)*160 + Math.sin((-wz)*0.0003)*260 + Math.cos((-wz)*0.0012)*100;
-        const sx1 = 75 + (meander - FJORD_WIDTH/2*0.35 - px) * s;
+        const meander = fjordMeander(-wz);
+        const fz = -wz;
+        const prog = Math.max(0, Math.min(fz / 10000, 1));
+        const cw = 3000 - prog * 1800;
+        const sx1 = 75 + (meander - cw/2*0.4 - px) * s;
         const sz = 75 + dz * s;
-        const sx2 = 75 + (meander + FJORD_WIDTH/2*0.35 - px) * s;
+        const sx2 = 75 + (meander + cw/2*0.4 - px) * s;
         if (sz > 5 && sz < 145) {
             ctx.fillStyle = 'rgba(0,60,0,0.3)';
             ctx.fillRect(Math.max(5, sx1), sz, Math.min(140, sx2) - Math.max(5, sx1), 2);
