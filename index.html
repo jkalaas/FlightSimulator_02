@@ -287,7 +287,7 @@ function boot() {
 // ============================================================
 
 const GAME_DURATION = 120;
-const FJORD_WIDTH = 500;
+const FJORD_WIDTH = 1200;
 const MOUNTAIN_HEIGHT = 600;
 const WATER_LEVEL = 0;
 const NUM_RINGS = 25;
@@ -716,22 +716,22 @@ function createRing(pos) {
     const ringMat = new THREE.MeshPhongMaterial({
         color: 0xff0000, emissive: 0x660000, specular: 0xff4444, shininess: 80,
     });
-    rg.add(new THREE.Mesh(new THREE.TorusGeometry(25, 2.2, 12, 36), ringMat));
+    rg.add(new THREE.Mesh(new THREE.TorusGeometry(45, 3, 12, 36), ringMat));
 
     const glowMat = new THREE.MeshBasicMaterial({
         color: 0xff4444, transparent: true, opacity: 0.5,
     });
-    rg.add(new THREE.Mesh(new THREE.TorusGeometry(25, 0.6, 8, 36), glowMat));
+    rg.add(new THREE.Mesh(new THREE.TorusGeometry(45, 1, 8, 36), glowMat));
 
     const discMat = new THREE.MeshBasicMaterial({
         color: 0xff2200, transparent: true, opacity: 0.06, side: THREE.DoubleSide,
     });
-    rg.add(new THREE.Mesh(new THREE.CircleGeometry(24, 24), discMat));
+    rg.add(new THREE.Mesh(new THREE.CircleGeometry(43, 24), discMat));
 
     rg.position.copy(pos);
     rg.userData = {
         passed: false,
-        radius: 25,
+        radius: 45,
         originalPos: pos.clone(),
         bob: Math.random() * Math.PI * 2,
     };
