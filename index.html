@@ -243,7 +243,7 @@
 
 <div id="warning-overlay"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 <script>
 // ============================================================
 //  FJORD SIMULATOR - F-22 Raptor through Norwegian Fjords
@@ -311,6 +311,7 @@ function init() {
     sunLight.shadow.mapSize.width = 2048;
     sunLight.shadow.mapSize.height = 2048;
     scene.add(sunLight);
+    scene.add(sunLight.target);
 
     scene.add(new THREE.HemisphereLight(0x87ceeb, 0x3a6a3a, 0.5));
 
@@ -338,7 +339,7 @@ function init() {
     document.getElementById('btn-start').addEventListener('click', startGame);
     document.getElementById('btn-restart').addEventListener('click', startGame);
 
-    clock = new THREE.Clock(false);
+    clock = new THREE.Clock();
 
     // Render one frame so user sees sky behind start screen
     renderer.render(scene, camera);
@@ -986,13 +987,15 @@ function updateMinimap() {
 }
 
 // ---- ANIMATE ----
+let lastTime = performance.now();
 function animate() {
     requestAnimationFrame(animate);
 
-    const dt = Math.min(clock.getDelta(), 0.05);
-    if (dt <= 0) return; // clock not running
+    const now = performance.now();
+    const dt = Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
 
-    if (!gameRunning) {
+    if (!gameRunning || dt <= 0) {
         renderer.render(scene, camera);
         return;
     }
