@@ -244,12 +244,15 @@
 <div id="warning-overlay"></div>
 
 <script>
-// Show errors visibly on screen
 function showError(msg) {
-    document.body.style.background = '#111';
-    document.body.innerHTML = '<div style="color:#f44;font-family:monospace;padding:40px;font-size:16px;white-space:pre-wrap;">' +
-        'FJORD SIMULATOR - ERROR:\n\n' + msg + '</div>';
+    var d = document.createElement('div');
+    d.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:#111;color:#f44;font-family:monospace;padding:40px;font-size:14px;white-space:pre-wrap;overflow:auto;';
+    d.textContent = 'FJORD SIMULATOR - ERROR:\n\n' + msg;
+    document.body.appendChild(d);
 }
+window.onerror = function(msg, url, line, col, err) {
+    showError(msg + '\nLine: ' + line + ':' + col + '\n\n' + (err && err.stack ? err.stack : ''));
+};
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
