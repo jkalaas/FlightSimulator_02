@@ -754,17 +754,26 @@ function generateRings() {
     rings = [];
     ringsPassed = 0;
 
-    const spacing = 350;
+    const spacing = 1050; // 3x original spacing
     for (let i = 0; i < NUM_RINGS; i++) {
-        // fz = positive distance (fjordHeight convention)
-        const fz = 200 + i * spacing;
-        // Use the SAME meander function as the terrain
+        const fz = 300 + i * spacing;
         const meander = fjordMeander(fz);
-        // Place ring right in the center of the safe corridor, small random offset
-        const x = meander + (Math.random()-0.5) * 40;
-        const y = 80 + Math.random() * 100;
-        // World z is negative
-        rings.push(createRing(new THREE.Vector3(x, y, -fz)));
+
+        // Gentle weaving path: smooth sine curves offset in X and Y
+        // so the player must steer up/down and left/right
+        const xWave = Math.sin(i * 0.9) * 60 + Math.cos(i * 0.5) * 40;
+        const yWave = Math.sin(i * 0.7 + 1.0) * 35 + Math.cos(i * 1.1) * 25;
+
+        const x = meander + xWave;
+        const y = 120 + yWave; // centered around 120, varies ~60 up/down
+
+        const ring = createRing(new THREE.Vector3(x, y, -fz));
+
+        // Orient ring to face the flight direction (-Z)
+        // Torus default is in XY plane facing Z, which is what we want
+        ring.rotation.set(0, 0, 0);
+
+        rings.push(ring);
     }
 }
 
@@ -1079,8 +1088,7 @@ function animate() {
     const t = clock.elapsedTime;
     for (const ring of rings) {
         if (!ring.userData.passed) {
-            ring.position.y = ring.userData.originalPos.y + Math.sin(t*2 + ring.userData.bob) * 4;
-            ring.rotation.y += dt * 0.3;
+            ring.position.y = ring.userData.originalPos.y + Math.sin(t*2 + ring.userData.bob) * 3;
         } else if (ring.userData.fadeTime !== undefined) {
             ring.userData.fadeTime += dt;
             const op = 1 - ring.userData.fadeTime * 2;
