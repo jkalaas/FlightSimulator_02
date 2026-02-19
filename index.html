@@ -243,8 +243,21 @@
 
 <div id="warning-overlay"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 <script>
+// Show errors visibly on screen
+function showError(msg) {
+    document.body.style.background = '#111';
+    document.body.innerHTML = '<div style="color:#f44;font-family:monospace;padding:40px;font-size:16px;white-space:pre-wrap;">' +
+        'FJORD SIMULATOR - ERROR:\n\n' + msg + '</div>';
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script>
+if (typeof THREE === 'undefined') {
+    showError('Three.js failed to load from CDN.\nCheck your internet connection or try a different browser.');
+    throw new Error('THREE not loaded');
+}
 // ============================================================
 //  FJORD SIMULATOR - F-22 Raptor through Norwegian Fjords
 // ============================================================
@@ -1063,8 +1076,12 @@ function onResize() {
 }
 
 // ---- BOOT ----
-init();
-startGame();
+try {
+    init();
+    startGame();
+} catch(e) {
+    showError('Game crashed during startup:\n\n' + e.message + '\n\n' + e.stack);
+}
 </script>
 </body>
 </html>
