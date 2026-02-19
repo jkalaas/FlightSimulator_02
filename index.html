@@ -489,7 +489,10 @@ function fjordHeight(x, z) {
     const localX = x - meander;
     const absX = Math.abs(localX);
 
-    const fjordHalf = FJORD_WIDTH / 2;
+    // Fjord starts very wide and narrows as you fly further (z increases)
+    const progress = Math.min(z / 8000, 1); // 0 at start, 1 at z=8000
+    const currentWidth = 2400 - progress * 1600; // 2400 wide -> 800 narrow
+    const fjordHalf = currentWidth / 2;
     const wallStart = fjordHalf * 0.35;
 
     // Flat water area in fjord center
@@ -780,7 +783,7 @@ function startGame() {
     f22Group = createF22();
     // Start above the fjord center
     const startMeander = Math.sin(0)*160 + Math.sin(0)*260 + Math.cos(0)*100; // =100 at z=0
-    f22Group.position.set(startMeander, 120, 0);
+    f22Group.position.set(startMeander, 250, 0);
     // No rotation: nose faces -Z which is forward
     scene.add(f22Group);
 
