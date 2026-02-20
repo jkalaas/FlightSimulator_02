@@ -195,21 +195,139 @@
             background: rgba(0,20,0,0.5);
         }
         #minimap canvas { width: 100%; height: 100%; }
+
+        /* Touch controls */
+        #touch-steer {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 140px;
+            height: 140px;
+            border: 2px solid rgba(0,255,0,0.25);
+            border-radius: 50%;
+            background: rgba(0,20,0,0.2);
+            display: none;
+        }
+        #touch-steer-knob {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(0,255,0,0.35);
+            border: 1px solid rgba(0,255,0,0.5);
+        }
+        #touch-throttle {
+            position: absolute;
+            bottom: 30px;
+            right: 180px;
+            width: 50px;
+            height: 140px;
+            border: 2px solid rgba(0,255,0,0.25);
+            border-radius: 8px;
+            background: rgba(0,20,0,0.2);
+            display: none;
+        }
+        #touch-throttle-fill {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 50%;
+            background: rgba(0,255,0,0.3);
+            border-radius: 0 0 6px 6px;
+        }
+        #touch-throttle-label {
+            position: absolute;
+            top: -18px; left: 0; right: 0;
+            text-align: center;
+            color: rgba(0,255,0,0.5);
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+        }
+        #touch-afterburner {
+            position: absolute;
+            bottom: 30px;
+            right: 100px;
+            width: 70px;
+            height: 70px;
+            border: 2px solid rgba(255,100,0,0.3);
+            border-radius: 50%;
+            background: rgba(60,20,0,0.3);
+            display: none;
+            color: rgba(255,150,0,0.7);
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            text-align: center;
+            line-height: 70px;
+        }
+        #touch-afterburner.active {
+            background: rgba(255,100,0,0.4);
+            border-color: rgba(255,150,0,0.6);
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .screen-overlay h1 { font-size: 36px; letter-spacing: 4px; }
+            .screen-overlay h2 { font-size: 14px; margin-bottom: 20px; }
+            .screen-overlay .subtitle { font-size: 12px; margin-bottom: 15px; padding: 0 20px; }
+            .screen-overlay .controls-info { font-size: 12px; margin-bottom: 15px; }
+            .start-btn { padding: 12px 35px; font-size: 16px; }
+            #minimap { width: 100px; height: 100px; bottom: 10px; right: 10px; }
+            #hud-left, #hud-right { font-size: 11px; }
+            #hud-top { font-size: 13px; }
+        }
+
+        /* ---- Plane Selection ---- */
+        #plane-select-row { display:flex; gap:28px; margin-bottom:16px; justify-content:center; }
+        .plane-card {
+            cursor:pointer; width:155px; padding:16px 12px; text-align:center;
+            border:2px solid rgba(255,255,255,0.15); border-radius:8px;
+            background:rgba(255,255,255,0.04); transition:all 0.2s; user-select:none;
+            pointer-events:all;
+        }
+        .plane-card:hover { border-color:rgba(52,152,219,0.6); background:rgba(52,152,219,0.1); }
+        .plane-card.selected { border-color:#3498db; background:rgba(52,152,219,0.2); box-shadow:0 0 18px rgba(52,152,219,0.4); }
+        .plane-card-name { font-size:14px; font-weight:bold; letter-spacing:2px; color:#fff; margin-bottom:6px; }
+        .plane-card-sub  { font-size:11px; color:#aaa; margin-bottom:8px; }
+        .plane-card-desc { font-size:11px; color:#888; line-height:1.65; }
+        #plane-hint { color:#e74c3c; font-size:12px; margin-bottom:10px; display:none; }
+        @media(max-width:600px){
+            #plane-select-row { gap:14px; }
+            .plane-card { width:130px; padding:12px 8px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="screen-overlay" id="start-screen" style="display:none;">
+<div class="screen-overlay" id="start-screen">
     <h1>Fjord Simulator</h1>
-    <h2>F-22 Raptor &mdash; Norway</h2>
-    <div class="subtitle">Navigate the fjords. Fly through rings. Don't crash.</div>
-    <div class="controls-info">
-        <kbd>W</kbd> / <kbd>S</kbd> &mdash; Pitch down / up<br>
-        <kbd>A</kbd> / <kbd>D</kbd> &mdash; Roll left / right<br>
-        <kbd>Q</kbd> / <kbd>E</kbd> &mdash; Yaw left / right<br>
-        <kbd>Shift</kbd> &mdash; Throttle up &nbsp;&nbsp; <kbd>Ctrl</kbd> &mdash; Throttle down<br>
-        <kbd>Space</kbd> &mdash; Afterburner
+    <h2>Norway &mdash; Ring Challenge</h2>
+    <p style="color:#aaa;font-size:13px;margin-bottom:18px;">Fly through the fjords &middot; Collect 25 rings &middot; Survive 2 minutes</p>
+
+    <div id="plane-select-row">
+        <div class="plane-card" id="card-f22" onclick="selectPlane('f22')">
+            <div class="plane-card-name">F-22 RAPTOR</div>
+            <div class="plane-card-sub">USA &bull; Twin-engine stealth</div>
+            <div class="plane-card-desc">High top speed<br>Powerful thrust<br>500+ knots</div>
+        </div>
+        <div class="plane-card" id="card-gripen" onclick="selectPlane('gripen')">
+            <div class="plane-card-name">JAS GRIPEN</div>
+            <div class="plane-card-sub">Sweden &bull; Delta-canard</div>
+            <div class="plane-card-desc">Agile handling<br>Single engine<br>Tight turns</div>
+        </div>
     </div>
+    <div id="plane-hint">Select a plane to continue</div>
+
+    <div class="controls-info">
+        <strong style="color:#aaa;">Controls</strong><br>
+        <kbd>W</kbd>/<kbd>S</kbd> or <kbd>&uarr;</kbd>/<kbd>&darr;</kbd> &mdash; Pitch &nbsp;&nbsp;
+        <kbd>A</kbd>/<kbd>D</kbd> or <kbd>&larr;</kbd>/<kbd>&rarr;</kbd> &mdash; Roll<br>
+        <kbd>Q</kbd>/<kbd>E</kbd> &mdash; Yaw &nbsp;&nbsp;
+        <kbd>Shift</kbd> &mdash; Throttle up &nbsp;&nbsp;
+        <kbd>Ctrl</kbd> &mdash; Throttle down<br>
+        <kbd>Space</kbd> &mdash; Afterburner &nbsp;&nbsp;
+        <kbd>G</kbd> &mdash; Fire missile (8 shots)
+    </div>
+
     <button class="start-btn" id="btn-start">Take Off</button>
 </div>
 
@@ -228,6 +346,7 @@
     <div id="hud-left">
         <div>SPD <span id="hud-speed">0</span> KTS</div>
         <div>THR <span id="hud-throttle">50</span>%</div>
+        <div>MSL <span id="hud-missiles">8</span><span id="hud-msl-ready" style="color:#0f0"> RDY</span></div>
     </div>
     <div id="hud-right">
         <div>ALT <span id="hud-alt">0</span> FT</div>
@@ -279,7 +398,7 @@ window.onerror = function(msg, url, line, col, err) {
 </script>
 <script>
 function boot() {
-    try { init(); startGame(); }
+    try { init(); }
     catch(e) { showError('Startup crash:\n' + e.message + '\n\n' + e.stack); }
 }
 // ============================================================
@@ -314,6 +433,26 @@ let minimapCtx;
 let warningOverlay;
 let animating = false;
 let sunLight;
+
+// ---- Plane selection ----
+let selectedPlane = null; // 'f22' or 'gripen'
+
+// ---- Missile system ----
+let missiles = [];
+let missileCount = 8;
+let missileCooldown = 0;
+const MISSILE_SPEED = 800;
+const MISSILE_MAX_RANGE = 4000;
+const MISSILE_COOLDOWN = 2.0;
+const MISSILE_MAX_AMMO = 8;
+
+// ---- PLANE SELECTION ----
+function selectPlane(type) {
+    selectedPlane = type;
+    document.querySelectorAll('.plane-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('card-' + type).classList.add('selected');
+    document.getElementById('plane-hint').style.display = 'none';
+}
 
 // ---- INIT ----
 function init() {
@@ -359,7 +498,7 @@ function init() {
     warningOverlay = document.getElementById('warning-overlay');
 
     const gameKeys = new Set([
-        'KeyW','KeyA','KeyS','KeyD','KeyQ','KeyE',
+        'KeyW','KeyA','KeyS','KeyD','KeyQ','KeyE','KeyG',
         'ShiftLeft','ShiftRight','ControlLeft','ControlRight',
         'Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'
     ]);
@@ -374,7 +513,12 @@ function init() {
     window.addEventListener('resize', onResize);
 
     document.getElementById('btn-start').addEventListener('click', startGame);
-    document.getElementById('btn-restart').addEventListener('click', startGame);
+    document.getElementById('btn-restart').addEventListener('click', function() {
+        selectedPlane = null;
+        document.querySelectorAll('.plane-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById('end-screen').style.display = 'none';
+        document.getElementById('start-screen').style.display = 'flex';
+    });
 
     clock = new THREE.Clock();
 
@@ -718,6 +862,208 @@ function createF22() {
     return g;
 }
 
+// ---- JAS GRIPEN ----
+function createGripen() {
+    const g = new THREE.Group();
+
+    const bodyMat   = new THREE.MeshPhongMaterial({ color: 0x6a7a8a, specular: 0x2a3a4a, shininess: 70 });
+    const darkMat   = new THREE.MeshPhongMaterial({ color: 0x3a4a55, specular: 0x1a2a35, shininess: 50 });
+    const accentMat = new THREE.MeshPhongMaterial({ color: 0x8a9aaa, specular: 0x4a5a6a, shininess: 60 });
+
+    // Fuselage (slimmer than F-22)
+    const fuse = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.65, 11), bodyMat);
+    fuse.scale.set(1, 0.6, 1);
+    g.add(fuse);
+
+    // Belly widening for engine
+    const belly = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.4, 8), darkMat);
+    belly.position.set(0, -0.18, 0.5);
+    belly.scale.set(1, 0.5, 1);
+    g.add(belly);
+
+    // Nose (sharper and longer)
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.42, 5.5, 6), darkMat);
+    nose.rotation.x = Math.PI / 2;
+    nose.position.z = -7.8;
+    nose.scale.set(0.85, 0.45, 1);
+    g.add(nose);
+
+    // Canopy (more reclining)
+    const canopyMat = new THREE.MeshPhongMaterial({
+        color: 0x6699bb, specular: 0xffffff, shininess: 120,
+        transparent: true, opacity: 0.6,
+    });
+    const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.7, 8, 6, 0, Math.PI*2, 0, Math.PI/2), canopyMat);
+    canopy.position.set(0, 0.28, -2.8);
+    canopy.scale.set(0.65, 0.42, 1.9);
+    g.add(canopy);
+
+    // Main delta wings (large sweep)
+    const mainWingShape = new THREE.Shape();
+    mainWingShape.moveTo(0, -1.5);
+    mainWingShape.lineTo(6.0, 2.5);
+    mainWingShape.lineTo(6.0, 3.2);
+    mainWingShape.lineTo(0, 3.8);
+    mainWingShape.closePath();
+    const mainWingGeo = new THREE.ExtrudeGeometry(mainWingShape, { depth: 0.10, bevelEnabled: false });
+
+    const rMainWing = new THREE.Mesh(mainWingGeo, bodyMat);
+    rMainWing.position.set(0.5, -0.08, -0.5);
+    rMainWing.rotation.x = -Math.PI / 2;
+    g.add(rMainWing);
+
+    const lMainWing = new THREE.Mesh(mainWingGeo, bodyMat);
+    lMainWing.position.set(-0.5, -0.08, -0.5);
+    lMainWing.rotation.x = -Math.PI / 2;
+    lMainWing.scale.x = -1;
+    g.add(lMainWing);
+
+    // Canards (signature Gripen feature: small forward wings)
+    const canardShape = new THREE.Shape();
+    canardShape.moveTo(0, 0);
+    canardShape.lineTo(2.4, 0.8);
+    canardShape.lineTo(2.4, 1.2);
+    canardShape.lineTo(0, 0.9);
+    canardShape.closePath();
+    const canardGeo = new THREE.ExtrudeGeometry(canardShape, { depth: 0.08, bevelEnabled: false });
+
+    const rCanard = new THREE.Mesh(canardGeo, accentMat);
+    rCanard.position.set(0.4, -0.03, -4.0);
+    rCanard.rotation.x = -Math.PI / 2;
+    g.add(rCanard);
+
+    const lCanard = new THREE.Mesh(canardGeo, accentMat);
+    lCanard.position.set(-0.4, -0.03, -4.0);
+    lCanard.rotation.x = -Math.PI / 2;
+    lCanard.scale.x = -1;
+    g.add(lCanard);
+
+    // Single vertical tail (center)
+    const tailGeo = new THREE.BoxGeometry(0.14, 3.2, 2.8);
+    const tail = new THREE.Mesh(tailGeo, bodyMat);
+    tail.position.set(0, 1.4, 3.8);
+    g.add(tail);
+
+    // Small stabilators near tail
+    const stabGeo = new THREE.BoxGeometry(2.4, 0.07, 1.4);
+    const rStab = new THREE.Mesh(stabGeo, bodyMat);
+    rStab.position.set(1.6, -0.05, 4.0);
+    g.add(rStab);
+    const lStab = new THREE.Mesh(stabGeo, bodyMat);
+    lStab.position.set(-1.6, -0.05, 4.0);
+    g.add(lStab);
+
+    // Single center engine intake
+    const intGeo = new THREE.CylinderGeometry(0.55, 0.42, 2.4, 10);
+    const intMat = new THREE.MeshPhongMaterial({ color: 0x1e2a32 });
+    const intake = new THREE.Mesh(intGeo, intMat);
+    intake.position.set(0, -0.28, 1.5);
+    intake.rotation.x = Math.PI / 2;
+    g.add(intake);
+
+    // Single engine glow
+    const glowMat = new THREE.MeshBasicMaterial({ color: 0xff6600, transparent: true, opacity: 0.8 });
+    const glow = new THREE.Mesh(new THREE.CircleGeometry(0.42, 10), glowMat);
+    glow.position.set(0, -0.28, 5.85);
+    g.add(glow);
+
+    g.userData.glows = [glow]; // single element — compatible with animate() glow code
+    g.scale.set(1.5, 1.5, 1.5);
+    return g;
+}
+
+// ---- MISSILE ----
+function createMissileMesh() {
+    const mg = new THREE.Group();
+
+    // Body
+    const bodyGeo = new THREE.CylinderGeometry(0.12, 0.12, 1.8, 6);
+    const bodyMat = new THREE.MeshPhongMaterial({ color: 0xcccccc, specular: 0x888888, shininess: 80 });
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
+    body.rotation.x = Math.PI / 2;
+    mg.add(body);
+
+    // Nose cone
+    const noseGeo = new THREE.ConeGeometry(0.12, 0.5, 6);
+    const noseMat = new THREE.MeshPhongMaterial({ color: 0x333333 });
+    const noseM = new THREE.Mesh(noseGeo, noseMat);
+    noseM.rotation.x = Math.PI / 2;
+    noseM.position.z = -1.15;
+    mg.add(noseM);
+
+    // Rear glow
+    const glowGeo = new THREE.CircleGeometry(0.10, 6);
+    const glowMat = new THREE.MeshBasicMaterial({ color: 0xff8800, transparent: true, opacity: 0.9 });
+    const glowDisc = new THREE.Mesh(glowGeo, glowMat);
+    glowDisc.position.z = 0.92;
+    mg.add(glowDisc);
+
+    // Fins
+    const finGeo = new THREE.BoxGeometry(0.04, 0.3, 0.4);
+    const finMat = new THREE.MeshPhongMaterial({ color: 0x888888 });
+    for (let i = 0; i < 4; i++) {
+        const fin = new THREE.Mesh(finGeo, finMat);
+        fin.rotation.z = (i * Math.PI / 2) + Math.PI / 4;
+        fin.position.z = 0.6;
+        mg.add(fin);
+    }
+
+    return mg;
+}
+
+function fireMissile() {
+    if (missileCount <= 0 || missileCooldown > 0) return;
+
+    const mesh = createMissileMesh();
+
+    // Spawn at nose of plane (~8 units ahead of group center in world space)
+    const spawnOffset = new THREE.Vector3(0, 0, -8).applyQuaternion(f22Group.quaternion);
+    mesh.position.copy(f22Group.position).add(spawnOffset);
+    mesh.quaternion.copy(f22Group.quaternion);
+
+    // Velocity: forward direction * (MISSILE_SPEED + current speed)
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(f22Group.quaternion);
+    const velocity = forward.multiplyScalar(MISSILE_SPEED + speed);
+
+    scene.add(mesh);
+    missiles.push({ mesh, velocity, distanceTraveled: 0 });
+
+    missileCount--;
+    missileCooldown = MISSILE_COOLDOWN;
+}
+
+function updateMissiles(dt) {
+    if (missileCooldown > 0) missileCooldown = Math.max(0, missileCooldown - dt);
+
+    // Fire on G key (reset immediately to prevent holding = spam)
+    if (keys['KeyG'] && gameRunning) {
+        fireMissile();
+        keys['KeyG'] = false;
+    }
+
+    for (let i = missiles.length - 1; i >= 0; i--) {
+        const m = missiles[i];
+        const step = m.velocity.clone().multiplyScalar(dt);
+        m.mesh.position.add(step);
+        m.distanceTraveled += step.length();
+
+        const mp = m.mesh.position;
+        const expired = m.distanceTraveled > MISSILE_MAX_RANGE;
+        const hitTerrain = mp.y < fjordHeight(mp.x, -mp.z) + 2;
+        const hitWater = mp.y < WATER_LEVEL + 1;
+        const tooHigh = mp.y > 1050;
+
+        if (expired || hitTerrain || hitWater || tooHigh) {
+            scene.remove(m.mesh);
+            m.mesh.traverse(child => {
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) child.material.dispose();
+            });
+            missiles.splice(i, 1);
+        }
+    }
+}
+
 // ---- RINGS ----
 function createRing(pos) {
     const rg = new THREE.Group();
@@ -789,6 +1135,14 @@ function clearWorld() {
     rings.forEach(r => scene.remove(r));
     rings = [];
     if (f22Group) { scene.remove(f22Group); f22Group = null; }
+    missiles.forEach(m => {
+        scene.remove(m.mesh);
+        m.mesh.traverse(child => {
+            if (child.geometry) child.geometry.dispose();
+            if (child.material) child.material.dispose();
+        });
+    });
+    missiles = [];
 }
 
 function startGame() {
@@ -796,14 +1150,19 @@ function startGame() {
     document.getElementById('end-screen').style.display = 'none';
     document.getElementById('hud').style.display = 'block';
 
+    // Require plane selection
+    if (!selectedPlane) {
+        document.getElementById('start-screen').style.display = 'flex';
+        document.getElementById('plane-hint').style.display = 'block';
+        return;
+    }
+
     clearWorld();
 
-    // F-22: model nose points -Z, tail points +Z. No rotation needed.
-    f22Group = createF22();
-    // Start above the fjord center, matching the meander function
+    // Create selected plane (nose points -Z, tail points +Z — no rotation needed)
+    f22Group = (selectedPlane === 'gripen') ? createGripen() : createF22();
     const startMeander = fjordMeander(0);
     f22Group.position.set(startMeander, 200, 0);
-    // No rotation: nose faces -Z which is forward
     scene.add(f22Group);
 
     speed = 250;
@@ -813,6 +1172,8 @@ function startGame() {
     gameTime = GAME_DURATION;
     gameRunning = true;
     ringsPassed = 0;
+    missileCount = MISSILE_MAX_AMMO;
+    missileCooldown = 0;
 
     updateTerrain(0);
     generateRings();
@@ -860,19 +1221,20 @@ function updateFlight(dt) {
     if (keys['ControlLeft'] || keys['ControlRight']) throttle = Math.max(0.05, throttle - dt*0.5);
     afterburner = !!keys['Space'];
 
-    let targetSpeed = 120 + throttle * 380;
+    const isGripen = selectedPlane === 'gripen';
+    let targetSpeed = isGripen ? (100 + throttle * 340) : (120 + throttle * 380);
     if (afterburner) targetSpeed *= AFTERBURNER_MULT;
     speed += (targetSpeed - speed) * dt * 2;
 
-    // Rotation
-    const roll  = 2.8 * dt;
-    const pitch = 1.8 * dt;
-    const yaw   = 1.0 * dt;
+    // Rotation — Gripen is more agile
+    const roll  = (isGripen ? 3.4 : 2.8) * dt;
+    const pitch = (isGripen ? 2.2 : 1.8) * dt;
+    const yaw   = (isGripen ? 1.3 : 1.0) * dt;
 
-    if (keys['KeyA'])  f22Group.rotateZ(roll);
-    if (keys['KeyD'])  f22Group.rotateZ(-roll);
-    if (keys['KeyW'])  f22Group.rotateX(-pitch); // pitch down (nose down)
-    if (keys['KeyS'])  f22Group.rotateX(pitch);  // pitch up
+    if (keys['KeyA'] || keys['ArrowLeft'])  f22Group.rotateZ(roll);
+    if (keys['KeyD'] || keys['ArrowRight']) f22Group.rotateZ(-roll);
+    if (keys['KeyW'] || keys['ArrowUp'])    f22Group.rotateX(-pitch); // pitch down (nose down)
+    if (keys['KeyS'] || keys['ArrowDown'])  f22Group.rotateX(pitch);  // pitch up
     if (keys['KeyQ'])  f22Group.rotateY(yaw);
     if (keys['KeyE'])  f22Group.rotateY(-yaw);
 
@@ -959,6 +1321,20 @@ function updateHUD() {
     document.getElementById('hud-throttle').textContent = Math.round(throttle * 100);
     document.getElementById('hud-rings').textContent = `${ringsPassed}/${NUM_RINGS}`;
     document.getElementById('hud-score').textContent = score;
+
+    // Missile counter
+    document.getElementById('hud-missiles').textContent = missileCount;
+    const mslReady = document.getElementById('hud-msl-ready');
+    if (missileCooldown > 0) {
+        mslReady.textContent = ' ' + missileCooldown.toFixed(1) + 's';
+        mslReady.style.color = '#ff8800';
+    } else if (missileCount > 0) {
+        mslReady.textContent = ' RDY';
+        mslReady.style.color = '#0f0';
+    } else {
+        mslReady.textContent = ' EMPTY';
+        mslReady.style.color = '#f44';
+    }
 
     const mins = Math.floor(gameTime / 60);
     const secs = Math.floor(gameTime % 60);
@@ -1073,6 +1449,7 @@ function animate() {
     }
 
     updateFlight(dt);
+    updateMissiles(dt);
     checkCollisions();
     if (!gameRunning) { renderer.render(scene, camera); return; } // crashed during check
     updateHUD();
