@@ -1,0 +1,11 @@
+{
+  "name": "fjord-simulator",
+  "version": "2.0.0",
+  "description": "F-22 / JAS Gripen flight simulator through Norwegian fjords — Three.js browser game",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve ."
+  },
+  "keywords": ["three.js", "flight-simulator", "game", "webgl", "norway", "fjord"],
+  "license": "MIT"
+}

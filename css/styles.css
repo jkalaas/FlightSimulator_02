@@ -1,0 +1,337 @@
+/* ============================================================
+   FJORD SIMULATOR — Stylesheet
+   ============================================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    overflow: hidden;
+    background: #000;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+canvas { display: block; }
+
+
+/* ---- HUD -------------------------------------------------- */
+#hud {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 10;
+    display: none;
+}
+
+#hud-left {
+    position: absolute;
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    text-shadow: 0 0 8px #0f0;
+}
+
+#hud-right {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    text-align: right;
+    text-shadow: 0 0 8px #0f0;
+}
+
+#hud-top {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #0f0;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    text-align: center;
+    text-shadow: 0 0 8px #0f0;
+}
+
+#hud-bottom {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+
+/* ---- Crosshair -------------------------------------------- */
+#crosshair {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px; height: 60px;
+    border: 1px solid rgba(0, 255, 0, 0.5);
+    border-radius: 50%;
+}
+#crosshair::before, #crosshair::after {
+    content: '';
+    position: absolute;
+    background: rgba(0, 255, 0, 0.5);
+}
+#crosshair::before { top: 50%; left: -8px; right: -8px; height: 1px; }
+#crosshair::after  { left: 50%; top: -8px; bottom: -8px; width: 1px; }
+
+
+/* ---- Timer bar -------------------------------------------- */
+#timer-bar-container {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px; height: 6px;
+    background: rgba(0, 255, 0, 0.15);
+    border: 1px solid rgba(0, 255, 0, 0.4);
+    border-radius: 3px;
+    margin-top: 35px;
+}
+#timer-bar {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, #0f0, #0a0);
+    border-radius: 2px;
+    transition: width 0.5s linear, background 0.5s;
+}
+
+
+/* ---- Warning overlay -------------------------------------- */
+#warning-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(255, 0, 0, 0.3));
+    pointer-events: none;
+    z-index: 9;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+
+/* ---- Screen overlays (start / end) ------------------------ */
+.screen-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.85);
+}
+
+.screen-overlay h1 {
+    font-size: 64px;
+    color: #fff;
+    margin-bottom: 5px;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+}
+.screen-overlay h2 {
+    font-size: 20px;
+    color: #8ab4f8;
+    margin-bottom: 40px;
+    font-weight: 300;
+    letter-spacing: 3px;
+}
+.screen-overlay .subtitle {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+.screen-overlay .controls-info {
+    color: #888;
+    font-size: 13px;
+    line-height: 2;
+    text-align: center;
+    margin-bottom: 30px;
+}
+.controls-info kbd {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-family: 'Courier New', monospace;
+    color: #fff;
+}
+
+
+/* ---- Start / action buttons ------------------------------- */
+.start-btn {
+    pointer-events: all;
+    background: linear-gradient(135deg, #1a5276, #2e86c1);
+    color: #fff;
+    border: 1px solid #3498db;
+    padding: 15px 50px;
+    font-size: 18px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    border-radius: 4px;
+}
+.start-btn:hover {
+    background: linear-gradient(135deg, #2e86c1, #3498db);
+    box-shadow: 0 0 30px rgba(52, 152, 219, 0.4);
+}
+
+
+/* ---- End screen ------------------------------------------- */
+#end-screen { display: none; }
+#end-screen .score-display {
+    font-size: 48px;
+    color: #f1c40f;
+    margin: 15px 0;
+    text-shadow: 0 0 20px rgba(241, 196, 15, 0.5);
+}
+#end-screen .stats {
+    color: #aaa;
+    font-size: 15px;
+    line-height: 2;
+    margin-bottom: 25px;
+}
+
+
+/* ---- Minimap ---------------------------------------------- */
+#minimap {
+    position: absolute;
+    bottom: 20px; right: 20px;
+    width: 150px; height: 150px;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    border-radius: 50%;
+    overflow: hidden;
+    background: rgba(0, 20, 0, 0.5);
+}
+#minimap canvas { width: 100%; height: 100%; }
+
+
+/* ---- Touch controls (mobile) ------------------------------ */
+#touch-steer {
+    position: absolute;
+    bottom: 30px; left: 30px;
+    width: 140px; height: 140px;
+    border: 2px solid rgba(0, 255, 0, 0.25);
+    border-radius: 50%;
+    background: rgba(0, 20, 0, 0.2);
+    display: none;
+}
+#touch-steer-knob {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 255, 0, 0.35);
+    border: 1px solid rgba(0, 255, 0, 0.5);
+}
+#touch-throttle {
+    position: absolute;
+    bottom: 30px; right: 180px;
+    width: 50px; height: 140px;
+    border: 2px solid rgba(0, 255, 0, 0.25);
+    border-radius: 8px;
+    background: rgba(0, 20, 0, 0.2);
+    display: none;
+}
+#touch-throttle-fill {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 50%;
+    background: rgba(0, 255, 0, 0.3);
+    border-radius: 0 0 6px 6px;
+}
+#touch-throttle-label {
+    position: absolute;
+    top: -18px; left: 0; right: 0;
+    text-align: center;
+    color: rgba(0, 255, 0, 0.5);
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+}
+#touch-afterburner {
+    position: absolute;
+    bottom: 30px; right: 100px;
+    width: 70px; height: 70px;
+    border: 2px solid rgba(255, 100, 0, 0.3);
+    border-radius: 50%;
+    background: rgba(60, 20, 0, 0.3);
+    display: none;
+    color: rgba(255, 150, 0, 0.7);
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    text-align: center;
+    line-height: 70px;
+}
+#touch-afterburner.active {
+    background: rgba(255, 100, 0, 0.4);
+    border-color: rgba(255, 150, 0, 0.6);
+}
+
+
+/* ---- Plane selection cards -------------------------------- */
+#plane-select-row {
+    display: flex;
+    gap: 28px;
+    margin-bottom: 16px;
+    justify-content: center;
+}
+.plane-card {
+    cursor: pointer;
+    width: 155px;
+    padding: 16px 12px;
+    text-align: center;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    transition: all 0.2s;
+    user-select: none;
+    pointer-events: all;
+}
+.plane-card:hover {
+    border-color: rgba(52, 152, 219, 0.6);
+    background: rgba(52, 152, 219, 0.1);
+}
+.plane-card.selected {
+    border-color: #3498db;
+    background: rgba(52, 152, 219, 0.2);
+    box-shadow: 0 0 18px rgba(52, 152, 219, 0.4);
+}
+.plane-card-name {
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 6px;
+}
+.plane-card-sub  { font-size: 11px; color: #aaa; margin-bottom: 8px; }
+.plane-card-desc { font-size: 11px; color: #888; line-height: 1.65; }
+#plane-hint      { color: #e74c3c; font-size: 12px; margin-bottom: 10px; display: none; }
+
+
+/* ---- Responsive / mobile ---------------------------------- */
+@media (max-width: 768px) {
+    .screen-overlay h1       { font-size: 36px; letter-spacing: 4px; }
+    .screen-overlay h2       { font-size: 14px; margin-bottom: 20px; }
+    .screen-overlay .subtitle { font-size: 12px; margin-bottom: 15px; padding: 0 20px; }
+    .screen-overlay .controls-info { font-size: 12px; margin-bottom: 15px; }
+    .start-btn               { padding: 12px 35px; font-size: 16px; }
+    #minimap                 { width: 100px; height: 100px; bottom: 10px; right: 10px; }
+    #hud-left, #hud-right    { font-size: 11px; }
+    #hud-top                 { font-size: 13px; }
+}
+@media (max-width: 600px) {
+    #plane-select-row { gap: 14px; }
+    .plane-card       { width: 130px; padding: 12px 8px; }
+}
